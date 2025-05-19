@@ -1,0 +1,63 @@
+<div class="d-flex justify-content-center align-items-center vh-100" id="login-page">
+  <div class="card shadow-lg" style="width: 28rem;">
+    <div class="card-body">
+      <h3 class="card-title text-center mb-4">Đăng nhập</h3>
+      {{#if error}}
+        <div class="alert alert-danger text-center mb-3" id="error-message">{{error}}</div>
+      {{/if}}
+      <div class="error text-center mb-3" id="error-message" style="display: none;">{{error}}</div>
+      <form action="/login" method="POST">
+        <div class="mb-3">
+          <label for="user-name" class="form-label">Tên người dùng</label>
+          <input type="text" class="form-control" id="user-name" name="username" placeholder="Nhập tên đăng nhập" required>
+        </div>
+        <div class="mb-3 position-relative">
+          <label for="password" class="form-label">Mật khẩu</label>
+          <div class="input-group">
+            <input type="password" class="form-control" id="password" name="password" placeholder="Nhập mật khẩu" required>
+            <button type="button" class="btn btn-outline-secondary btn-no-border" id="toggle-password" tabindex="-1">
+              <i class="far fa-eye" id="toggle-icon"></i>
+            </button>
+          </div>
+          <div class="error" id="error-password" style="display: none;"></div>
+        </div>
+        <div class="divider"></div>
+        <button type="submit" class="btn btn-primary w-100">Đăng nhập</button>
+      </form>
+      <div class="text-center mt-3">
+        <p class="text-muted">Chưa có tài khoản? <a href="/register" class="text-decoration-none">Đăng ký</a></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+    var passwordInput = document.getElementById('password');
+    var toggleIcon = document.querySelector('#toggle-password');
+    var errorPassword = document.getElementById('error-password');
+    var icon = document.getElementById('toggle-icon');
+    
+
+    // Validation Password
+    passwordInput.onchange = function(){
+        if(passwordInput.value.length < 6){
+            errorPassword.style.display = 'block';
+            errorPassword.innerHTML = 'Mật khẩu phải có ít nhất 6 ký tự!';
+        }else{
+            errorPassword.style.display = 'none';
+        }
+    }
+
+    // Show Password
+    toggleIcon.onclick = function(){
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        } else {
+            passwordInput.type = 'password';
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        }
+    }
+</script>
