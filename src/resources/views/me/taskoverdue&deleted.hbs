@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quản Lý Task Overdue & Đã Xóa</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+  <style>
+    :root {
+      --danger-color: #dc3545;
+      --warning-color: #ffc107;
+      --secondary-color: #6c757d;
+      --dark-color: #212529;
+      --light-bg: #f8f9fa;
+      --border-radius: 12px;
+      --box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+      --hover-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+    }
+
+    body {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    .page-container {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+      margin: 2rem auto;
+      padding: 2rem;
+    }
+
+    .page-header {
+      border-bottom: 3px solid #e9ecef;
+      padding-bottom: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .page-title {
+      background: linear-gradient(135deg, var(--danger-color), var(--warning-color));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-weight: 800;
+      font-size: 2.2rem;
+      margin: 0;
+    }
+
+    .stats-row {
+      margin-bottom: 2rem;
+    }
+
+    .stat-card {
+      background: white;
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+      padding: 1.5rem;
+      text-align: center;
+      transition: all 0.3s ease;
+      border: none;
+      height: 100%;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--hover-shadow);
+    }
+
+    .stat-icon {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .stat-number {
+      font-size: 2rem;
+      font-weight: 700;
+      margin: 0.5rem 0;
+    }
+
+    .stat-label {
+      color: #6c757d;
+      font-weight: 500;
+    }
+
+    .section-header {
+      background: white;
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      justify-content: between;
+      align-items: center;
+    }
+
+    .section-title {
+      font-weight: 600;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .filter-controls {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .task-table {
+      background: white;
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+      overflow: hidden;
+    }
+
+    .table {
+      margin: 0;
+    }
+
+    .table th {
+      background: #f8f9fa;
+      border-bottom: 2px solid #dee2e6;
+      font-weight: 600;
+      padding: 1rem;
+    }
+
+    .table td {
+      padding: 1rem;
+      vertical-align: middle;
+    }
+
+    .task-row {
+      transition: all 0.2s ease;
+    }
+
+    .task-row:hover {
+      background-color: #f8f9fa;
+    }
+
+    .overdue-row {
+      border-left: 4px solid var(--danger-color);
+    }
+
+    .deleted-row {
+      border-left: 4px solid var(--secondary-color);
+      opacity: 0.7;
+    }
+
+    .task-title {
+      font-weight: 600;
+      color: var(--dark-color);
+    }
+
+    .task-description {
+      color: #6c757d;
+      font-size: 0.9rem;
+      margin-top: 0.25rem;
+    }
+
+    .status-badge {
+      padding: 0.375rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .status-overdue {
+      background: rgba(220, 53, 69, 0.1);
+      color: var(--danger-color);
+      border: 1px solid rgba(220, 53, 69, 0.3);
+    }
+
+    .status-deleted {
+      background: rgba(108, 117, 125, 0.1);
+      color: var(--secondary-color);
+      border: 1px solid rgba(108, 117, 125, 0.3);
+    }
+
+    .priority-badge {
+      padding: 0.25rem 0.5rem;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+
+    .priority-high { background: #fee2e2; color: #dc2626; }
+    .priority-medium { background: #fef3c7; color: #d97706; }
+    .priority-low { background: #dcfce7; color: #16a34a; }
+
+    .date-info {
+      font-size: 0.9rem;
+    }
+
+    .overdue-date {
+      color: var(--danger-color);
+      font-weight: 500;
+    }
+
+    .normal-date {
+      color: #6c757d;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .btn-sm-custom {
+      padding: 0.375rem 0.75rem;
+      font-size: 0.8rem;
+      border-radius: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 3rem 2rem;
+      color: #6c757d;
+    }
+
+    .empty-state i {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+      opacity: 0.5;
+    }
+
+    .back-button {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--danger-color), var(--warning-color));
+      border: none;
+      color: white;
+      font-size: 1.5rem;
+      box-shadow: var(--hover-shadow);
+      transition: all 0.3s ease;
+      z-index: 1000;
+    }
+
+    .back-button:hover {
+      transform: translateY(-2px);
+      background: linear-gradient(135deg, #c82333, #e0a800);
+    }
+
+    @media (max-width: 768px) {
+      .page-container {
+        margin: 1rem;
+        padding: 1.5rem;
+      }
+      
+      .page-title {
+        font-size: 1.8rem;
+      }
+      
+      .filter-controls {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      
+      .table-responsive {
+        font-size: 0.9rem;
+      }
+      
+      .action-buttons {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container-fluid">
+    <div class="page-container">
+      <!-- Page Header -->
+      <div class="page-header">
+        <h1 class="page-title">
+          <i class="fas fa-exclamation-triangle me-3"></i>
+          Quản Lý Task Overdue & Đã Xóa
+        </h1>
+        <p class="text-muted mb-0">Theo dõi các task quá hạn và đã bị xóa trong hệ thống</p>
+      </div>
+
+      <!-- Statistics -->
+      <div class="row stats-row g-4">
+        <div class="col-md-4">
+          <div class="stat-card">
+            <i class="fas fa-clock stat-icon text-danger"></i>
+            <div class="stat-number text-danger" id="overdueCount">{{overdueCount}}</div>
+            <div class="stat-label">Task Quá Hạn</div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="stat-card">
+            <i class="fas fa-trash stat-icon text-secondary"></i>
+            <div class="stat-number text-secondary" id="deletedCount">{{deletedCount}}</div>
+            <div class="stat-label">Task Đã Xóa</div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="stat-card">
+            <i class="fas fa-chart-line stat-icon text-warning"></i>
+            <div class="stat-number text-warning" id="totalCount">{{totalCount}}</div>
+            <div class="stat-label">Tổng Cần Xử Lý</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Overdue Tasks Section -->
+      <div class="section-header">
+        <h2 class="section-title text-danger">
+          <i class="fas fa-clock"></i>
+          Task Quá Hạn ({{overdueCount}})
+        </h2>
+        <div class="filter-controls">
+          <select class="form-select form-select-sm" id="overdueSort" style="width: auto;">
+            <option value="dueDate">Sắp xếp theo ngày hết hạn</option>
+            <option value="priority">Sắp xếp theo độ ưu tiên</option>
+            <option value="createdAt">Sắp xếp theo ngày tạo</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="task-table">
+        {{#if overdueTasks.length}}
+        <div class="table-responsive">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Task</th>
+                <th>Ngày hết hạn</th>
+                <th>Quá Hạn</th>
+                <th>Thao Tác</th>
+              </tr>
+            </thead>
+            <tbody>
+              {{#each overdueTasks}}
+              <tr class="task-row overdue-row">
+                <td>
+                  <div class="task-title">{{this.content}}</div>
+                  <span class="status-badge status-overdue">
+                    <i class="fas fa-exclamation-circle me-1"></i>Quá Hạn
+                  </span>
+                </td>
+                <td>
+                  <div class="date-info overdue-date">
+                    <i class="fas fa-calendar-times me-1"></i>
+                    {{formatDate2 this.deadline}}
+                  </div>
+                </td>
+                <td>
+                  <div class="text-danger fw-bold">
+                    {{calculateOverdueDays this.deadline}} ngày
+                  </div>
+                </td>
+                <td>
+                  <div class="action-buttons">
+                    <button class="btn btn-outline-primary btn-sm-custom" onclick="editTask('{{this._id}}')">
+                      <i class="fas fa-edit me-1"></i>Sửa
+                    </button>
+                    <button class="btn btn-outline-success btn-sm-custom" onclick="markComplete('{{this._id}}')">
+                      <i class="fas fa-check me-1"></i>Hoàn Thành
+                    </button>
+                    <button class="btn btn-outline-danger btn-sm-custom" onclick="deleteTask('{{this._id}}')">
+                      <i class="fas fa-trash me-1"></i>Xóa
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              {{/each}}
+            </tbody>
+          </table>
+        </div>
+        {{else}}
+        <div class="empty-state">
+          <i class="fas fa-smile text-success"></i>
+          <h3>Tuyệt vời! Không có task nào quá hạn</h3>
+          <p>Tất cả công việc đều được thực hiện đúng tiến độ.</p>
+        </div>
+        {{/if}}
+      </div>
+
+      <!-- Deleted Tasks Section -->
+      <div class="section-header mt-5">
+        <h2 class="section-title text-secondary">
+          <i class="fas fa-trash"></i>
+          Task Đã Xóa ({{deletedCount}})
+        </h2>
+        <div class="filter-controls">
+          <select class="form-select form-select-sm" id="deletedSort" style="width: auto;">
+            <option value="deletedAt">Sắp xếp theo ngày xóa</option>
+            <option value="createdAt">Sắp xếp theo ngày tạo</option>
+            <option value="title">Sắp xếp theo tên</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="task-table">
+        {{#if deletedTasks.length}}
+        <div class="table-responsive">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Task</th>
+                <th>Ngày Tạo</th>
+                <th>Ngày Xóa</th>
+                <th>Tình trạng</th>
+                <th>Lý Do</th>
+                <th>Thao Tác</th>
+              </tr>
+            </thead>
+            <tbody>
+              {{#each deletedTasks}}
+              <tr class="task-row deleted-row">
+                <td>
+                  <div class="task-title">{{this.content}}</div>
+                  <span class="status-badge status-deleted">
+                    <i class="fas fa-trash me-1"></i>Đã Xóa
+                  </span>
+                </td>
+                <td>
+                  <div class="date-info normal-date">
+                    <i class="fas fa-calendar-plus me-1"></i>
+                    {{formatDate1 this.createdAt}}
+                  </div>
+                </td>
+                <td>
+                  <div class="date-info normal-date">
+                    <i class="fas fa-calendar-minus me-1"></i>
+                    {{formatDate1 this.deletedAt}}
+                  </div>
+                </td>
+                <td>
+                    <span class="text-muted">
+                        {{#if (eq this.status "complete")}} Đã hoàn thành
+                        {{else if (eq this.status "pending")}} Chưa hoàn thành
+                        {{else if (eq this.status "overdue")}} Quá hạn
+                        {{else}} Không xác định
+                        {{/if}}
+                    </span>
+                </td>
+                <td>
+                  <span class="text-muted">
+                    {{#if this.deletedReason}}
+                      {{this.deletedReason}}
+                    {{else}}
+                      Không có lý do
+                    {{/if}}
+                  </span>
+                </td>
+                <td>
+                  <div class="action-buttons">
+                    <button class="btn btn-outline-danger btn-sm-custom" onclick="permanentDelete('{{this._id}}')">
+                      <i class="fas fa-times me-1"></i>Xóa Vĩnh Viễn
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              {{/each}}
+            </tbody>
+          </table>
+        </div>
+        {{else}}
+        <div class="empty-state">
+          <i class="fas fa-inbox"></i>
+          <h3>Không có task nào bị xóa</h3>
+          <p>Thùng rác trống, tất cả task đều còn hoạt động.</p>
+        </div>
+        {{/if}}
+      </div>
+    </div>
+  </div>
+
+  <!-- Back to Dashboard Button -->
+  <button class="back-button" onclick="goBack()" title="Quay lại Dashboard">
+    <i class="fas fa-arrow-left"></i>
+  </button>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<script>
+class TaskManagement {
+  constructor() {
+    this.init();
+  }
+
+  init() {
+    this.attachEventListeners();
+    this.updateStatistics();
+  }
+
+  attachEventListeners() {
+    // Sort functionality
+    document.getElementById('overdueSort')?.addEventListener('change', (e) => {
+      this.sortTasks('overdue', e.target.value);
+    });
+
+    document.getElementById('deletedSort')?.addEventListener('change', (e) => {
+      this.sortTasks('deleted', e.target.value);
+    });
+  }
+
+  sortTasks(type, sortBy) {
+    // In a real application, this would make an API call
+    console.log(`Sorting ${type} tasks by ${sortBy}`);
+    // Reload page with sort parameters
+    const url = new URL(window.location);
+    url.searchParams.set(`${type}Sort`, sortBy);
+    window.location.href = url.toString();
+  }
+
+}
+
+// Task Actions
+function editTask(taskId) {
+  if (confirm('Chuyển đến trang chỉnh sửa task?')) {
+    window.location.href = `/me/tasks/edit/${taskId}`;
+  }
+}
+
+function markComplete(taskId) {
+  if (confirm('Đánh dấu task này là đã hoàn thành?')) {
+    // Make API call to update task status
+    fetch(`/me/tasks/${taskId}/complete`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        showNotification('Task đã được đánh dấu hoàn thành!', 'success');
+        location.reload();
+      } else {
+        showNotification('Có lỗi xảy ra khi cập nhật task!', 'error');
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      showNotification('Có lỗi xảy ra!', 'error');
+    });
+  }
+}
+
+function deleteTask(taskId) {
+  const reason = prompt('Lý do xóa task (tùy chọn):');
+  if (reason !== null) {
+    fetch(`/me/tasks/${taskId}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ reason })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        showNotification('Task đã được xóa!', 'success');
+        location.reload();
+      } else {
+        showNotification('Có lỗi xảy ra khi xóa task!', 'error');
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      showNotification('Có lỗi xảy ra!', 'error');
+    });
+  }
+}
+
+function permanentDelete(taskId) {
+  if (confirm('⚠️ CẢNH BÁO: Xóa vĩnh viễn task này? Hành động này không thể hoàn tác!')) {
+    fetch(`/me/tasks/${taskId}/permanent`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        showNotification('Task đã được xóa vĩnh viễn!', 'success');
+        location.reload();
+      } else {
+        showNotification('Có lỗi xảy ra khi xóa task!', 'error');
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      showNotification('Có lỗi xảy ra!', 'error');
+    });
+  }
+}
+
+function goBack() {
+  window.history.back() || (window.location.href = '/me/dashboard');
+}
+
+function showNotification(message, type) {
+  // Simple notification system
+  const notification = document.createElement('div');
+  notification.className = `alert alert-${type === 'success' ? 'success' : 'danger'} position-fixed`;
+  notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+  notification.innerHTML = `
+    <div class="d-flex justify-content-between align-items-center">
+      <span>${message}</span>
+      <button type="button" class="btn-close" onclick="this.parentElement.parentElement.remove()"></button>
+    </div>
+  `;
+  document.body.appendChild(notification);
+  
+  // Auto remove after 5 seconds
+  setTimeout(() => {
+    notification.remove();
+  }, 5000);
+}
+
+// Initialize the application
+new TaskManagement();
+</script>
+
+</body>
+</html>

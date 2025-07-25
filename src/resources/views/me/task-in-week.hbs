@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Việc Trong Tuần</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <style>
+    body {
+      background-color: #f8fafc;
+      font-family: 'Segoe UI', sans-serif;
+    }
+    .card-task {
+      max-width: 720px;
+      margin: 60px auto;
+      padding: 40px;
+      background-color: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
+      position: relative;
+    }
+    .back-button {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      font-size: 1.2rem;
+      text-decoration: none;
+      color: #4b5563;
+      display: inline-flex;
+      align-items: center;
+      transition: color 0.2s;
+    }
+    .back-button:hover {
+      color: #1f2937;
+    }
+    .back-button i {
+      margin-right: 6px;
+    }
+    .task-title {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #1e293b;
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .progress-wrapper {
+      height: 32px;
+      background-color: #e5e7eb;
+      border-radius: 20px;
+      position: relative;
+      margin-bottom: 30px;
+      overflow: hidden;
+    }
+    .progress-bar-inner {
+      height: 100%;
+      background: linear-gradient(90deg, #4caf50, #81c784);
+      width: 0%;
+      transition: width 0.4s ease;
+    }
+    .progress-label {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      font-weight: 600;
+      color: #1f2937;
+    }
+    .task-list {
+      list-style: none;
+      padding-left: 0;
+      margin-bottom: 0;
+    }
+    .task-item {
+      background-color: #f9fafb;
+      border-radius: 12px;
+      padding: 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+      border-left: 5px solid #3b82f6;
+      transition: all 0.2s;
+    }
+    .task-item:hover {
+      background-color: #f1f5f9;
+    }
+    .task-content {
+      font-size: 1rem;
+      color: #111827;
+    }
+    .task-content.completed {
+      text-decoration: line-through;
+      color: #9ca3af;
+    }
+    .task-actions .btn {
+      font-size: 0.85rem;
+      padding: 4px 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card-task">
+    <a href="/me/dashboard" class="back-button"><i>&larr;</i></a>
+    <h2 class="task-title">🗓️ VIỆC CẦN LÀM TRONG TUẦN</h2>
+
+    <div class="progress-wrapper">
+      <div class="progress-bar-inner" id="progress-bar"></div>
+      <span class="progress-label" id="progress-label">0%</span>
+    </div>
+
+    <ul class="task-list">
+      {{#if todos.length}}
+      {{#each todos}}
+        <li class="task-item">
+          <span class="task-content {{#if completed}}completed{{/if}}">{{this.content}}</span>
+           <div class="task-actions d-flex gap-2">
+            {{#unless completed}}
+              <form action="/me/complete/{{_id}}?_method=PUT" method="POST" style="display: inline;">
+                <button type="submit" class="btn btn-success btn-sm" title="Hoàn thành">✅</button>
+              </form>
+            {{/unless}}
+            <form action="/me/delete/{{_id}}?_method=DELETE" method="POST" style="display: inline;">
+              <button type="submit" class="btn btn-danger btn-sm" title="Xóa">❌</button>
+            </form>
+          </div>
+        </li>
+      {{/each}}
+      {{else}}
+        <li class="text-center py-4 text-muted" style="font-style: italic;">
+          📭 Hiện tại chưa có công việc nào trong tháng.
+        </li>
+      {{/if}}
+    </ul>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const taskItems = document.querySelectorAll('.task-item');
+      const completedItems = document.querySelectorAll('.task-content.completed');
+      const progressBar = document.getElementById('progress-bar');
+      const progressLabel = document.getElementById('progress-label');
+
+      const total = taskItems.length;
+      const done = completedItems.length;
+      const percent = total > 0 ? Math.round((done / total) * 100) : 0;
+
+      progressBar.style.width = percent + '%';
+      progressLabel.textContent = percent + '%';
+
+      if (percent === 100) {
+        progressBar.style.background = 'linear-gradient(90deg, #00c853, #64dd17)';
+      }
+    });
+  </script>
+</body>
+</html>

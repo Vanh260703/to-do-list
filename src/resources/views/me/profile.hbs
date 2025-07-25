@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hồ sơ cá nhân</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #ffd700, #ffed4e);
+            --success-gradient: linear-gradient(135deg, #4CAF50, #45a049);
+            --info-gradient: linear-gradient(135deg, #2196F3, #1976D2);
+            --warning-gradient: linear-gradient(135deg, #FF9800, #F57C00);
+            --danger-gradient: linear-gradient(135deg, #f44336, #d32f2f);
+            --purple-gradient: linear-gradient(135deg, #9C27B0, #7B1FA2);
+            --card-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            --card-hover-shadow: 0 15px 40px rgba(0,0,0,0.15);
+            --border-radius: 20px;
+            --small-radius: 10px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--primary-gradient);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+        }
+        
+        .profile-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 20px;
+        }
+
+        /* Header Section */
+        .profile-header {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 3rem 2rem;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .profile-header:hover {
+            box-shadow: var(--card-hover-shadow);
+            transform: translateY(-2px);
+        }
+        
+        .profile-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: var(--primary-gradient);
+        }
+        
+        .avatar-section {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .avatar {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            background: var(--primary-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 3.5rem;
+            color: white;
+            position: relative;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+            transition: all 0.3s ease;
+            border: 4px solid white;
+        }
+
+        .avatar:hover {
+            transform: scale(1.05);
+            box-shadow: 0 12px 35px rgba(102, 126, 234, 0.4);
+        }
+        
+        .avatar-upload {
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            background: var(--success-gradient);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
+            transition: all 0.3s ease;
+            border: 2px solid white;
+        }
+
+        .avatar-upload:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.6);
+        }
+
+        #display-name {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .text-muted {
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .badge-section {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        
+        .achievement-badge {
+            background: var(--secondary-gradient);
+            color: #333;
+            padding: 0.7rem 1.5rem;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .achievement-badge:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 215, 0, 0.4);
+        }
+
+        /* Statistics Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (min-width: 768px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (min-width: 992px) {
+            .stats-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (min-width: 1200px) {
+            .stats-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 2rem 1.5rem;
+            text-align: center;
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--primary-gradient);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--card-hover-shadow);
+        }
+
+        .stat-card:hover::before {
+            transform: scaleX(1);
+        }
+        
+        .stat-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 2rem;
+            color: white;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover .stat-icon {
+            transform: scale(1.1) rotate(5deg);
+        }
+        
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .stat-label {
+            color: #7f8c8d;
+            font-size: 1rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Progress Section */
+        .progress-section {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 2.5rem;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .progress-section:hover {
+            box-shadow: var(--card-hover-shadow);
+            transform: translateY(-2px);
+        }
+
+        .progress-section h4 {
+            color: #2c3e50;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            font-size: 1.4rem;
+        }
+        
+        .progress-item {
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .progress-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            font-weight: 600;
+            color: #34495e;
+        }
+
+        .progress-label span:first-child {
+            font-size: 1rem;
+        }
+
+        .progress-label span:last-child {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+            background: #f8f9fa;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+        }
+        
+        .progress {
+            height: 12px;
+            border-radius: 10px;
+            background-color: #ecf0f1;
+            overflow: hidden;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .progress-bar {
+            border-radius: 10px;
+            transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(45deg, transparent 25%, rgba(255,255,255,0.2) 25%, rgba(255,255,255,0.2) 50%, transparent 50%, transparent 75%, rgba(255,255,255,0.2) 75%);
+            background-size: 20px 20px;
+            animation: progress-animation 1s linear infinite;
+        }
+
+        @keyframes progress-animation {
+            0% { background-position: 0 0; }
+            100% { background-position: 20px 0; }
+        }
+
+        /* Form Section */
+        .info-section {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 2.5rem;
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s ease;
+        }
+
+        .info-section:hover {
+            box-shadow: var(--card-hover-shadow);
+            transform: translateY(-2px);
+        }
+
+        .info-section h4 {
+            color: #2c3e50;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            font-size: 1.4rem;
+        }
+        
+        .form-floating {
+            margin-bottom: 2rem;
+            position: relative;
+        }
+        
+        .form-control {
+            border-radius: var(--small-radius);
+            border: 2px solid #e9ecef;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            padding: 1rem 0.75rem;
+            background-color: #fafbfc;
+        }
+        
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.25rem rgba(102, 126, 234, 0.15);
+            background-color: white;
+            transform: translateY(-1px);
+        }
+
+        .form-floating > label {
+            color: #6c757d;
+            font-weight: 500;
+        }
+
+        .form-floating > .form-control:focus ~ label,
+        .form-floating > .form-control:not(:placeholder-shown) ~ label {
+            color: #667eea;
+            font-weight: 600;
+        }
+        
+        .btn-save {
+            background: var(--primary-gradient);
+            border: none;
+            border-radius: var(--small-radius);
+            padding: 1rem 3rem;
+            font-weight: 700;
+            font-size: 1.1rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-save::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .btn-save:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-save:hover::before {
+            left: 100%;
+        }
+
+        .btn-save:active {
+            transform: translateY(-1px);
+        }
+
+        /* Alert Styles */
+        .alert {
+            border-radius: var(--small-radius);
+            border: none;
+            font-weight: 500;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .alert-danger {
+            background: linear-gradient(135deg, #fee, #fdd);
+            color: #c62828;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 576px) {
+            .profile-container {
+                margin: 1rem auto;
+                padding: 0 10px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .avatar {
+                width: 100px;
+                height: 100px;
+                font-size: 2.5rem;
+            }
+
+            #display-name {
+                font-size: 1.6rem;
+            }
+
+            .badge-section {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .profile-header,
+            .progress-section,
+            .info-section {
+                padding: 1.5rem;
+            }
+
+            .stat-card {
+                padding: 1.5rem;
+            }
+
+            .stat-number {
+                font-size: 2rem;
+            }
+
+            .achievement-badge {
+                padding: 0.5rem 1rem;
+                font-size: 0.8rem;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (min-width: 992px) {
+            .stats-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (min-width: 1200px) {
+            .stats-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        /* Loading Animation */
+        .loading-spinner {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Smooth transitions for dynamic content */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="profile-container">
+        <!-- Profile Header -->
+        <div class="profile-header fade-in">
+            <div class="avatar-section">
+                <div class="avatar" id="user-avatar">
+                    <i class="fas fa-user"></i>
+                    <button class="avatar-upload" title="Thay đổi ảnh đại diện">
+                        <i class="fas fa-camera"></i>
+                    </button>
+                </div>
+                <h2 id="display-name">{{#if user.fullname}}{{user.fullname}}{{else}}Chưa cập nhật{{/if}}</h2>
+                <p class="text-muted">@{{user.username}}</p>
+                <div class="badge-section">
+                    <span class="achievement-badge">
+                        <i class="fas fa-star me-2"></i>Thành viên từ {{#if user.joinDate}}{{user.joinDate}}{{else}}2024{{/if}}
+                    </span>
+                    {{#if user.level}}
+                    <span class="achievement-badge">
+                        <i class="fas fa-trophy me-2"></i>Level {{user.level}}
+                    </span>
+                    {{/if}}
+                    {{#if user.isPremium}}
+                    <span class="achievement-badge" style="background: linear-gradient(135deg, #e91e63, #c2185b);">
+                        <i class="fas fa-crown me-2"></i>Premium
+                    </span>
+                    {{/if}}
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistics Grid -->
+        <div class="stats-grid">
+            <div class="stat-card fade-in" style="animation-delay: 0.1s;">
+                <div class="stat-icon" style="background: var(--success-gradient);">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="stat-number" id="completed-tasks">{{#if user.completedTasks}}{{user.completedTasks}}{{else}}0{{/if}}</div>
+                <div class="stat-label">Task đã hoàn thành</div>
+            </div>
+            
+            <div class="stat-card fade-in" style="animation-delay: 0.2s;">
+                <div class="stat-icon" style="background: var(--info-gradient);">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="stat-number" id="pending-tasks">{{#if user.pendingTasks}}{{user.pendingTasks}}{{else}}0{{/if}}</div>
+                <div class="stat-label">Task đang thực hiện</div>
+            </div>
+            
+            <div class="stat-card fade-in" style="animation-delay: 0.3s;">
+                <div class="stat-icon" style="background: var(--warning-gradient);">
+                    <i class="fas fa-calendar-alt"></i>
+                </div>
+                <div class="stat-number" id="days-active">{{#if user.activeDays}}{{user.activeDays}}{{else}}0{{/if}}</div>
+                <div class="stat-label">Ngày hoạt động</div>
+            </div>
+
+            {{#if user.streak}}
+            <div class="stat-card fade-in" style="animation-delay: 0.4s;">
+                <div class="stat-icon" style="background: var(--purple-gradient);">
+                    <i class="fas fa-fire"></i>
+                </div>
+                <div class="stat-number" id="streak">{{user.streak}}</div>
+                <div class="stat-label">Streak hiện tại</div>
+            </div>
+            {{/if}}
+        </div>
+
+        <!-- Progress Section -->
+        {{#if user.showProgress}}
+        <div class="progress-section fade-in" style="animation-delay: 0.5s;">
+            <h4>
+                <i class="fas fa-chart-line me-2"></i>
+                Tiến độ hoạt động
+            </h4>
+            
+            {{#if user.monthlyProgress}}
+            <div class="progress-item">
+                <div class="progress-label">
+                    <span><i class="fas fa-calendar-check me-2"></i>Hoàn thành task tháng này</span>
+                    <span>{{user.monthlyProgress}}/{{#if user.monthlyTarget}}{{user.monthlyTarget}}{{else}}10{{/if}}</span>
+                </div>
+                <div class="progress">
+                    <div class="progress-bar bg-success" style="width: {{#if user.monthlyProgressPercent}}{{user.monthlyProgressPercent}}{{else}}0{{/if}}%"></div>
+                </div>
+            </div>
+            {{/if}}
+            
+            {{#if user.yearlyProgress}}
+            <div class="progress-item">
+                <div class="progress-label">
+                    <span><i class="fas fa-bullseye me-2"></i>Mục tiêu năm</span>
+                    <span>{{user.yearlyProgress}}/{{#if user.yearlyTarget}}{{user.yearlyTarget}}{{else}}100{{/if}}</span>
+                </div>
+                <div class="progress">
+                    <div class="progress-bar bg-primary" style="width: {{#if user.yearlyProgressPercent}}{{user.yearlyProgressPercent}}{{else}}0{{/if}}%"></div>
+                </div>
+            </div>
+            {{/if}}
+            
+            {{#if user.currentExp}}
+            <div class="progress-item">
+                <div class="progress-label">
+                    <span><i class="fas fa-star me-2"></i>Cấp độ hiện tại</span>
+                    <span>{{user.currentExp}}/{{#if user.nextLevelExp}}{{user.nextLevelExp}}{{else}}1000{{/if}} EXP</span>
+                </div>
+                <div class="progress">
+                    <div class="progress-bar bg-warning" style="width: {{#if user.expProgressPercent}}{{user.expProgressPercent}}{{else}}0{{/if}}%"></div>
+                </div>
+            </div>
+            {{/if}}
+        </div>
+        {{/if}}
+
+        <!-- Profile Information Form -->
+        <div class="info-section fade-in" style="animation-delay: 0.6s;">
+            <h4>
+                <i class="fas fa-user-edit me-2"></i>
+                Thông tin cá nhân
+            </h4>
+            
+            {{#if error}}
+            <div class="alert alert-danger text-center mb-4" id="error-message">
+                <i class="fas fa-exclamation-triangle me-2"></i>{{error}}
+            </div>
+            {{/if}}
+            
+            {{#if user}}
+            <div class="alert alert-danger text-center mb-4" id="dynamic-error-message" style="display: none;"></div>
+            
+            <form action="/me/saveInformation" method="POST" id="profile-form" novalidate>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            <input type="text" class="form-control" id="fullname" name="fullname" 
+                                   value="{{user.fullname}}" placeholder="Nhập họ và tên" required>
+                            <label for="fullname">
+                                <i class="fas fa-user me-2"></i>Họ và tên *
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            <input type="text" class="form-control" id="username" name="username" 
+                                   value="{{user.username}}" placeholder="Nhập tên đăng nhập" required readonly>
+                            <label for="username">
+                                <i class="fas fa-at me-2"></i>Tên đăng nhập
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            <input type="email" class="form-control" id="email" name="email" 
+                                   value="{{user.email}}" placeholder="Nhập email" required>
+                            <label for="email">
+                                <i class="fas fa-envelope me-2"></i>Email *
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            <input type="tel" class="form-control" id="phone" name="phone" 
+                                   value="{{user.phonenumber}}" placeholder="Nhập số điện thoại">
+                            <label for="phone">
+                                <i class="fas fa-phone me-2"></i>Số điện thoại
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-floating">
+                    <textarea class="form-control" id="bio" name="bio" style="height: 120px" 
+                              placeholder="Viết một chút về bản thân..." maxlength="500">{{user.bio}}</textarea>
+                    <label for="bio">
+                        <i class="fas fa-info-circle me-2"></i>Giới thiệu bản thân
+                    </label>
+                    <div class="form-text">Tối đa 500 ký tự</div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            <input type="date" class="form-control" id="birthdate" name="birthdate" 
+                                   value="{{formatDate2 user.birthdate}}">
+                            <label for="birthdate">
+                                <i class="fas fa-birthday-cake me-2"></i>Ngày sinh
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            <select class="form-control" id="gender" name="gender">
+                                <option value="">Chọn giới tính</option>
+                                <option value="male" {{#if (eq user.gender 'male')}}selected{{/if}}>Nam</option>
+                                <option value="female" {{#if (eq user.gender 'female')}}selected{{/if}}>Nữ</option>
+                                <option value="other" {{#if (eq user.gender 'other')}}selected{{/if}}>Khác</option>
+                            </select>
+                            <label for="gender">
+                                <i class="fas fa-venus-mars me-2"></i>Giới tính
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center mt-4">
+                    <button type="submit" class="btn btn-primary btn-save" id="save-btn">
+                        <i class="fas fa-save me-2"></i>
+                        Lưu thông tin
+                    </button>
+                </div>
+            </form>
+            {{/if}}
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+      <script>
+    class ProfileManager {
+      constructor() {
+        this.form = document.getElementById('profile-form');
+        this.errorMessage = document.getElementById('dynamic-error-message');
+        this.saveBtn = document.getElementById('save-btn');
+        this.fullnameInput = document.getElementById('fullname');
+        this.displayName = document.getElementById('display-name');
+        this.avatarUpload = document.querySelector('.avatar-upload');
+        this.avatar = document.querySelector('.avatar');
+
+        this.init();
+      }
+
+      init() {
+        this.bindEvents();
+        this.animateStats();
+        this.initTooltips();
+      }
+
+      bindEvents() {
+        if (this.fullnameInput && this.displayName) {
+          this.fullnameInput.addEventListener('input', (e) => {
+            this.displayName.textContent = e.target.value.trim() || 'Chưa cập nhật';
+          });
+        }
+
+        if (this.avatarUpload) {
+          this.avatarUpload.addEventListener('click', () => this.handleAvatarUpload());
+        }
+
+        if (this.form) {
+          this.form.addEventListener('submit', (e) => this.handleFormSubmit(e));
+        }
+
+        this.setupInputValidation();
+        this.setupStatCardEffects();
+      }
+
+      handleAvatarUpload() {
+        const fileInput = document.createElement('input');
+        fileInput.type = 'file';
+        fileInput.accept = 'image/*';
+        fileInput.style.display = 'none';
+
+        fileInput.addEventListener('change', (e) => {
+          const file = e.target.files[0];
+          if (file) {
+            if (file.size > 5 * 1024 * 1024) {
+              this.showError('Kích thước file không được vượt quá 5MB!');
+              return;
+            }
+
+            if (!file.type.startsWith('image/')) {
+              this.showError('Vui lòng chọn file hình ảnh!');
+              return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+              this.avatar.style.backgroundImage = `url(${e.target.result})`;
+              this.avatar.style.backgroundSize = 'cover';
+              this.avatar.style.backgroundPosition = 'center';
+              this.avatar.innerHTML = '<button class="avatar-upload"><i class="fas fa-camera"></i></button>';
+              const newUploadBtn = this.avatar.querySelector('.avatar-upload');
+              newUploadBtn.addEventListener('click', () => this.handleAvatarUpload());
+            };
+            reader.readAsDataURL(file);
+          }
+        });
+
+        document.body.appendChild(fileInput);
+        fileInput.click();
+        document.body.removeChild(fileInput);
+      }
+
+      setupInputValidation() {
+        const inputs = this.form.querySelectorAll('input, textarea, select');
+        inputs.forEach(input => {
+          input.addEventListener('blur', () => this.validateField(input));
+          input.addEventListener('input', () => this.clearFieldError(input));
+        });
+      }
+
+      validateField(input) {
+        if (input.hasAttribute('required') && !input.value.trim()) {
+          input.classList.add('is-invalid');
+          this.showError(`${input.previousElementSibling?.innerText || 'Trường này'} là bắt buộc.`);
+          return false;
+        }
+        input.classList.remove('is-invalid');
+        return true;
+      }
+
+      clearFieldError(input) {
+        if (input.classList.contains('is-invalid')) {
+          input.classList.remove('is-invalid');
+          this.errorMessage.style.display = 'none';
+        }
+      }
+
+      showError(message) {
+        this.errorMessage.innerText = message;
+        this.errorMessage.style.display = 'block';
+      }
+
+      handleFormSubmit(e) {
+        e.preventDefault();
+        const inputs = this.form.querySelectorAll('input[required], textarea[required], select[required]');
+        let isValid = true;
+
+        inputs.forEach(input => {
+          if (!this.validateField(input)) isValid = false;
+        });
+
+        if (!isValid) {
+          this.showError('Vui lòng điền đầy đủ các trường bắt buộc!');
+          return;
+        }
+
+        this.form.submit();
+      }
+
+      setupStatCardEffects() {
+        const statCards = document.querySelectorAll('.stat-card');
+        statCards.forEach((card, index) => {
+          card.style.animationDelay = `${0.1 * (index + 1)}s`;
+        });
+      }
+
+      animateStats() {
+        const numbers = document.querySelectorAll('.stat-number');
+        numbers.forEach(num => {
+          const value = parseInt(num.innerText);
+          if (isNaN(value)) return;
+
+          let count = 0;
+          const increment = Math.ceil(value / 30);
+          const interval = setInterval(() => {
+            count += increment;
+            if (count >= value) {
+              num.innerText = value;
+              clearInterval(interval);
+            } else {
+              num.innerText = count;
+            }
+          }, 20);
+        });
+      }
+
+      initTooltips() {
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.forEach(function (tooltipTriggerEl) {
+          new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      new ProfileManager();
+    });
+  </script>
+</body>
+</html>

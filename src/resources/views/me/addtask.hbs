@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thêm Công Việc</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background: #f8fafc;
+      font-family: 'Segoe UI', sans-serif;
+    }
+    .card-custom {
+      border: none;
+      border-radius: 1rem;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+    }
+    .form-control, .form-select {
+      border-radius: 0.5rem;
+    }
+    .btn-custom {
+      background-color: #4f46e5;
+      border: none;
+      border-radius: 0.5rem;
+    }
+    .btn-custom:hover {
+      background-color: #4338ca;
+    }
+    .back-button {
+      color: #6b7280;
+      text-decoration: none;
+      font-size: 1.5rem;
+      font-weight: bold;
+      transition: color 0.2s;
+    }
+    .back-button:hover {
+      color: #374151;
+    }
+    .header-section {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 2rem;
+    }
+    .title-center {
+      flex: 1;
+      text-align: center;
+      margin: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container d-flex justify-content-center align-items-center min-vh-100">
+    <div class="card card-custom p-4" style="width: 100%; max-width: 600px;">
+      <div class="header-section">
+        <a href="/me/dashboard" class="back-button">&larr;</a>
+        <h3 class="title-center fw-bold">📝 THÊM CÔNG VIỆC MỚI</h3>
+        <div style="width: 24px;"></div> <!-- Spacer để cân bằng -->
+      </div>
+      
+      <form action="/me/add" method="POST">
+        <div class="mb-3">
+          <label for="content" class="form-label">Nội dung công việc</label>
+          <input type="text" name="content" id="content" class="form-control" placeholder="Nhập việc cần làm..." required>
+        </div>
+        <div class="mb-4">
+          <label for="deadline" class="form-label">Thời hạn công việc</label>
+          <select name="taskType" id="deadline" class="form-select" required>
+            <option value="inDay">Công việc trong ngày</option>
+            <option value="inWeek">Công việc trong tuần</option>
+            <option value="inMonth">Công việc trong tháng</option>
+          </select>
+        </div>
+        <div class="d-grid">
+          <button type="submit" class="btn btn-custom text-white fw-semibold py-2">+ Thêm công việc</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

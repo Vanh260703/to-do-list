@@ -1,6 +1,7 @@
 const User =  require('../models/User');
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
+const jwwt = require('jsonwebtoken');
 
 class UserController{
     // [GET] /login
@@ -31,13 +32,14 @@ class UserController{
                     req.session.user = {
                         id: user._id.toString(),
                         username: user.username,
+                        fullname: user.fullname,
                     }
                     console.log(req.session.user);
                     req.session.save((error) => {
                         if(error){
                             console.log('Lỗi lưu session', error);
                         }
-                        res.redirect('/me/');
+                        res.redirect('/me/dashboard');
                     });
                 })
                 .catch(next)

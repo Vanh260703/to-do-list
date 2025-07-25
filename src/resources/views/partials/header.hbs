@@ -3,22 +3,40 @@
     <a class="navbar-brand fw-bold mt-0" href="/">
       📝 <span class="text-warning">To-do App</span>
     </a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
       <span class="navbar-toggler-icon"></span>
     </button>
+
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav ms-auto">
         {{#if user}}
-            <li class="nav-item dropdown">
-              <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                Xin chào, {{fullname}}
-              </button>
-              <ul class="dropdown-menu dropdown-menu-end"> <!-- Thêm class dropdown-menu-end -->
-                <li><a class="dropdown-item" href="/me/profile">Thông tin cá nhân</a></li>
-                <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item" href="/logout">Đăng xuất</a></li>
-              </ul>
-            </li>
+          <!-- Icon chuông -->
+          <li class="nav-item me-3 position-relative">
+            <a class="nav-link text-white p-0 position-relative" href="/notifications">
+              <i class="bi bi-bell fs-5 {{#if notifCount}}bell-shake{{/if}}"></i>
+              {{#if notifCount}}
+              <span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle">
+                <span class="visually-hidden">New alerts</span>
+              </span>
+              {{/if}}
+            </a>
+          </li>
+
+          <!-- Dropdown người dùng -->
+          <li class="nav-item dropdown">
+            <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+              Xin chào, {{user.fullname}}
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item" href="/me/dashboard">Dashboard</a></li>
+              <li><a class="dropdown-item" href="/me/profile">Thông tin cá nhân</a></li>
+              <li><a class="dropdown-item" href="/me/add_new_task">Thêm nhiệm vụ mới</a></li>
+              <li><a class="dropdown-item" href="/me/manager-task">Quản lý các nhiệm vụ đã quá hạn</a></li>
+              <li><a class="dropdown-item" href="/me/history-log">Lịch sử hoạt động</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="/logout">Đăng xuất</a></li>
+            </ul>
+          </li>
         {{else}}
           <li class="nav-item">
             <a class="nav-link text-white-50" href="/login">Đăng nhập</a>
@@ -28,3 +46,76 @@
     </div>
   </div>
 </nav>
+
+<style>
+  /* Chuông rung */
+  @keyframes shakeBell {
+    0% { transform: rotate(0deg); }
+    20% { transform: rotate(-10deg); }
+    40% { transform: rotate(10deg); }
+    60% { transform: rotate(-6deg); }
+    80% { transform: rotate(6deg); }
+    100% { transform: rotate(0deg); }
+  }
+
+  .bell-shake {
+    animation: shakeBell 0.8s ease-in-out infinite;
+    transform-origin: center;
+  }
+
+  /* Toast */
+  .toast-message {
+    min-width: 250px;
+    max-width: 350px;
+    background-color: #323232;
+    color: #fff;
+    padding: 15px 20px;
+    margin-bottom: 10px;
+    border-radius: 6px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+    opacity: 1;
+    transition: opacity 0.5s ease-out;
+    pointer-events: auto;
+  }
+
+  .toast-message.fade-out {
+    opacity: 0;
+  }
+</style>
+
+<script>
+  function showToast(message) {
+    // Luôn tạo container mới hoặc sử dụng container có sẵn
+    let container = document.getElementById('toast-container');
+    if (!container) {
+      container = document.createElement('div');
+      container.id = 'toast-container';
+      container.className = 'toast-container position-fixed top-0 end-0 p-3';
+      container.style.cssText = 'z-index: 1055; pointer-events: none;';
+      document.body.appendChild(container);
+    }
+    
+    const toast = document.createElement('div');
+    toast.className = 'toast-message';
+    toast.textContent = message;
+    container.appendChild(toast);
+
+    setTimeout(() => {
+      toast.classList.add('fade-out');
+      setTimeout(() => {
+        toast.remove();
+        // Xóa container nếu không còn toast nào
+        if (container.children.length === 0) {
+          container.remove();
+        }
+      }, 500);
+    }, 5000);
+  }
+
+  {{#if toastMessage}}
+  document.addEventListener('DOMContentLoaded', function () {
+    showToast({{{toastMessage}}});
+  });
+  {{/if}}
+</script>
+

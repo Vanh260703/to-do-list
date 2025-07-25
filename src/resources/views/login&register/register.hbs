@@ -1,107 +1,586 @@
-<div id="register-page" class="d-flex justify-content-center align-items-center">
-  <div class="card shadow-lg" style="width: 30rem;">
-    <div class="card-body">
-      <h3 class="card-title text-center mb-4">Đăng ký</h3>
-        {{#if error}}
-        <div class="alert alert-danger text-center mb-3" id="error-message">{{error}}</div>
-      {{/if}}
-      <div class="error text-center mb-3" id="error-message" style="display: none;"></div>
-      <form action="/register" method="POST">
-       <div class="mb-3">
-          <label for="fullname" class="form-label">Tên người dùng</label>
-          <input type="text" class="form-control" id="fullname" name="fullname" placeholder="Nhập tên người dùng" required>
-        </div>
-        <div class="mb-3">
-          <label for="username" class="form-label">Tên đăng nhập</label>
-          <input type="text" class="form-control" id="username" name="username" placeholder="Nhập tên người dùng" required>
-        </div>
-        <div class="mb-3">
-          <label for="email" class="form-label">Email</label>
-          <input type="email" class="form-control" id="email" name="email" placeholder="Nhập email" required>
-        </div>
-        <div class="mb-3">
-          <label for="password" class="form-label">Mật khẩu</label>
-          <div class="input-group">
-            <input type="password" class="form-control" id="password" name="password" placeholder="Nhập mật khẩu" required>
-            <button class="btn btn-outline-secondary toggle-password" type="button">
-              <i class="far fa-eye"></i>
-            </button>
-          </div>
-        </div>
-        <div class="mb-3">
-          <label for="confirm-password" class="form-label">Xác nhận mật khẩu</label>
-          <div class="input-group">
-            <input type="password" class="form-control" id="confirm-password" name="confirm-password" placeholder="Nhập lại mật khẩu" required>
-            <button class="btn btn-outline-secondary toggle-password" type="button">
-              <i class="far fa-eye"></i>
-            </button>
-          </div>
-        </div>
-        <button type="submit" class="btn btn-primary w-100">Đăng ký</button>
-      </form>
-      <div class="text-center mt-3">
-        <p class="text-muted">Đã có tài khoản? <a href="/login" class="text-decoration-none">Đăng nhập</a></p>
-      </div>
-    </div>
-  </div>
-</div>
-
-<script>
-    var passwordInput = document.getElementById('password');
-    var confirmPasswordInput = document.getElementById('confirm-password');
-    var toggleIcons = document.querySelectorAll('.toggle-password');
-    var errorMessage = document.getElementById('error-message');    
-    var errorPassword = document.getElementById('error-password');
-    var form = document.querySelector('form');
-    var isValid = true;
-
-    // Show/Hide Password
-   toggleIcons.forEach(function(icon){
-    icon.onclick = function(){
-        // Lấy input tương ứng với nút được bấm
-            var input = icon.previousElementSibling;
-
-            if (input.type === 'password') {
-                input.type = 'text';
-                icon.querySelector('i').classList.remove('fa-eye');
-                icon.querySelector('i').classList.add('fa-eye-slash');
-            } else {
-                input.type = 'password';
-                icon.querySelector('i').classList.remove('fa-eye-slash');
-                icon.querySelector('i').classList.add('fa-eye');
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng Ký Tài Khoản</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .register-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px 0;
+        }
+        
+        .register-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: none;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            max-width: 500px;
+            width: 100%;
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-align: center;
+            padding: 30px 20px;
+            border: none;
+        }
+        
+        .card-header h3 {
+            margin: 0;
+            font-weight: 600;
+            font-size: 1.8rem;
+        }
+        
+        .card-header p {
+            margin: 10px 0 0 0;
+            opacity: 0.9;
+            font-size: 0.95rem;
+        }
+        
+        .card-body {
+            padding: 40px;
+        }
+        
+        .form-floating {
+            margin-bottom: 20px;
+        }
+        
+        .form-floating > .form-control {
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            background: rgba(248, 249, 250, 0.8);
+        }
+        
+        .form-floating > .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.25rem rgba(102, 126, 234, 0.25);
+            background: white;
+        }
+        
+        .form-floating > label {
+            color: #6c757d;
+            font-weight: 500;
+        }
+        
+        .input-group .form-control {
+            border: 2px solid #e9ecef;
+            border-radius: 12px 0 0 12px;
+            transition: all 0.3s ease;
+            background: rgba(248, 249, 250, 0.8);
+        }
+        
+        .input-group .btn {
+            border: 2px solid #e9ecef;
+            border-left: none;
+            border-radius: 0 12px 12px 0;
+            background: rgba(248, 249, 250, 0.8);
+            color: #6c757d;
+            transition: all 0.3s ease;
+        }
+        
+        .input-group .btn:hover {
+            background: #e9ecef;
+            color: #495057;
+        }
+        
+        .form-select {
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            background: rgba(248, 249, 250, 0.8);
+            padding: 12px 16px;
+        }
+        
+        .form-select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.25rem rgba(102, 126, 234, 0.25);
+            background: white;
+        }
+        
+        .btn-register {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 12px;
+            padding: 14px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn-register:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+        
+        .alert {
+            border: none;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            font-weight: 500;
+        }
+        
+        .alert-danger {
+            background: rgba(220, 53, 69, 0.1);
+            color: #dc3545;
+            border-left: 4px solid #dc3545;
+        }
+        
+        .alert-success {
+            background: rgba(25, 135, 84, 0.1);
+            color: #198754;
+            border-left: 4px solid #198754;
+        }
+        
+        .login-link {
+            text-align: center;
+            margin-top: 25px;
+            padding-top: 25px;
+            border-top: 1px solid #e9ecef;
+        }
+        
+        .login-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .login-link a:hover {
+            color: #764ba2;
+            text-decoration: underline;
+        }
+        
+        .required {
+            color: #dc3545;
+        }
+        
+        .form-text {
+            color: #6c757d;
+            font-size: 0.875rem;
+            margin-top: 5px;
+        }
+        
+        .password-strength {
+            height: 4px;
+            border-radius: 2px;
+            background: #e9ecef;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+        
+        .password-strength-bar {
+            height: 100%;
+            transition: all 0.3s ease;
+            width: 0%;
+        }
+        
+        .strength-weak { background: #dc3545; width: 25%; }
+        .strength-fair { background: #fd7e14; width: 50%; }
+        .strength-good { background: #ffc107; width: 75%; }
+        .strength-strong { background: #198754; width: 100%; }
+        
+        @media (max-width: 576px) {
+            .register-container {
+                padding: 10px;
             }
-    }
-   })
-   // Validation Password
-    passwordInput.onchange = function(){
-        if(passwordInput.value.length < 6){
-            errorMessage.style.display = 'block';
-            errorMessage.innerHTML = 'Mật khẩu phải có ít nhất 6 ký tự!';
-            isValid = false;
-        }else if(passwordInput.value.length > 20){
-            errorMessage.style.display = 'block';
-            errorMessage.innerHTML = 'Mật khẩu không được quá 20 ký tự!';
-            isValid = false;
-        }else{
-            errorMessage.style.display = 'none';
+            
+            .card-body {
+                padding: 30px 20px;
+            }
         }
-    }
-    // Validation Confirm Password
-    confirmPasswordInput.onchange = function(){
-        if(confirmPasswordInput.value !== passwordInput.value){
-            errorMessage.style.display = 'block';
-            errorMessage.innerHTML = 'Mật khẩu không khớp!';
-            isValid = false;
-        }else{
-            errorMessage.style.display = 'none';
-        }
-    }
-    // Ngăn cho form gửi đi nếu có lỗi
-   form.onsubmit = function(e){
-    if(!isValid){
-        e.preventDefault();
-   }
-   }
+    </style>
+</head>
+<body>
+    <div class="register-container">
+        <div class="register-card card">
+            <div class="card-header">
+                <h3><i class="fas fa-user-plus me-2"></i>Đăng Ký Tài Khoản</h3>
+                <p>Tạo tài khoản mới để bắt đầu hành trình của bạn</p>
+            </div>
+            
+            <div class="card-body">
+                <!-- Error/Success Messages -->
+                <div class="alert alert-danger" id="error-message" style="display: none;">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <span id="error-text"></span>
+                </div>
+                
+                <div class="alert alert-success" id="success-message" style="display: none;">
+                    <i class="fas fa-check-circle me-2"></i>
+                    <span id="success-text"></span>
+                </div>
+                
+                <form id="registerForm" action="/register" method="POST" novalidate>
+                    <!-- Họ và tên -->
+                    <div class="form-floating">
+                        <input type="text" class="form-control" id="fullname" name="fullname" placeholder="Họ và tên" required>
+                        <label for="fullname">Họ và tên <span class="required">*</span></label>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                    
+                    <!-- Tên đăng nhập -->
+                    <div class="form-floating">
+                        <input type="text" class="form-control" id="username" name="username" placeholder="Tên đăng nhập" required>
+                        <label for="username">Tên đăng nhập <span class="required">*</span></label>
+                        <div class="form-text">Chỉ được sử dụng chữ cái, số và dấu gạch dưới</div>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                    
+                    <!-- Email -->
+                    <div class="form-floating">
+                        <input type="email" class="form-control" id="email" name="email" placeholder="Email" required>
+                        <label for="email">Địa chỉ Email <span class="required">*</span></label>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                    
+                    <!-- Số điện thoại -->
+                    <div class="form-floating">
+                        <input type="tel" class="form-control" id="phone" name="phonenumber" placeholder="Số điện thoại" required>
+                        <label for="phone">Số điện thoại <span class="required">*</span></label>
+                        <div class="form-text">Ví dụ: 0901234567</div>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                    
+                    <!-- Giới tính -->
+                    <div class="mb-3">
+                        <label for="gender" class="form-label">Giới tính <span class="required">*</span></label>
+                        <select class="form-select" id="gender" name="gender" required>
+                            <option value="">Chọn giới tính</option>
+                            <option value="male">Nam</option>
+                            <option value="female">Nữ</option>
+                            <option value="other">Khác</option>
+                        </select>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                    
+                    <!-- Mật khẩu -->
+                    <div class="mb-3">
+                        <div class="input-group">
+                            <input type="password" class="form-control" id="password" name="password" placeholder="Mật khẩu" required>
+                            <button class="btn btn-outline-secondary toggle-password" type="button" data-target="password">
+                                <i class="far fa-eye"></i>
+                            </button>
+                        </div>
+                        <div class="password-strength">
+                            <div class="password-strength-bar" id="password-strength-bar"></div>
+                        </div>
+                        <div class="form-text" id="password-help">Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường và số</div>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                    
+                    <!-- Xác nhận mật khẩu -->
+                    <div class="mb-3">
+                        <div class="input-group">
+                            <input type="password" class="form-control" id="confirm-password" name="confirm-password" placeholder="Xác nhận mật khẩu" required>
+                            <button class="btn btn-outline-secondary toggle-password" type="button" data-target="confirm-password">
+                                <i class="far fa-eye"></i>
+                            </button>
+                        </div>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                    
+                    <!-- Giới thiệu bản thân -->
+                    <div class="form-floating mb-4">
+                        <textarea class="form-control" id="bio" name="bio" placeholder="Giới thiệu bản thân" style="height: 100px; resize: vertical;"></textarea>
+                        <label for="bio">Giới thiệu bản thân</label>
+                        <div class="form-text">Viết vài dòng về bản thân bạn (tùy chọn)</div>
+                    </div>
+                    
+                    <!-- Điều khoản -->
+                    <div class="form-check mb-4">
+                        <input class="form-check-input" type="checkbox" id="terms" name="terms" required>
+                        <label class="form-check-label" for="terms">
+                            Tôi đồng ý với <a href="#" class="text-decoration-none">Điều khoản sử dụng</a> và <a href="#" class="text-decoration-none">Chính sách bảo mật</a> <span class="required">*</span>
+                        </label>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                    
+                    <!-- Submit Button -->
+                    <button type="submit" class="btn btn-register w-100">
+                        <i class="fas fa-user-plus me-2"></i>Tạo Tài Khoản
+                    </button>
+                </form>
+                
+                <!-- Login Link -->
+                <div class="login-link">
+                    <p class="text-muted mb-0">Đã có tài khoản? <a href="/login">Đăng nhập ngay</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
 
-   
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<script>
+class RegisterForm {
+    constructor() {
+        this.form = document.getElementById('registerForm');
+        this.errorMessage = document.getElementById('error-message');
+        this.errorText = document.getElementById('error-text');
+        this.successMessage = document.getElementById('success-message');
+        this.successText = document.getElementById('success-text');
+        
+        this.init();
+    }
+    
+    init() {
+        this.setupPasswordToggle();
+        this.setupValidation();
+        this.setupPasswordStrength();
+        this.setupFormSubmit();
+    }
+    
+    setupPasswordToggle() {
+        const toggleButtons = document.querySelectorAll('.toggle-password');
+        
+        toggleButtons.forEach(button => {
+            button.addEventListener('click', (e) => {
+                const targetId = button.getAttribute('data-target');
+                const input = document.getElementById(targetId);
+                const icon = button.querySelector('i');
+                
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    icon.classList.remove('fa-eye');
+                    icon.classList.add('fa-eye-slash');
+                } else {
+                    input.type = 'password';
+                    icon.classList.remove('fa-eye-slash');
+                    icon.classList.add('fa-eye');
+                }
+            });
+        });
+    }
+    
+    setupValidation() {
+        const inputs = this.form.querySelectorAll('input, select, textarea');
+        
+        inputs.forEach(input => {
+            input.addEventListener('blur', () => this.validateField(input));
+            input.addEventListener('input', () => this.clearFieldError(input));
+        });
+    }
+    
+    validateField(field) {
+        const value = field.value.trim();
+        let isValid = true;
+        let errorMessage = '';
+        
+        // Required field validation
+        if (field.hasAttribute('required') && !value) {
+            isValid = false;
+            errorMessage = 'Trường này là bắt buộc';
+        }
+        
+        // Specific field validations
+        switch (field.id) {
+            case 'fullname':
+                if (value && value.length < 2) {
+                    isValid = false;
+                    errorMessage = 'Họ tên phải có ít nhất 2 ký tự';
+                }
+                break;
+                
+            case 'username':
+                if (value) {
+                    const usernameRegex = /^[a-zA-Z0-9_]{3,20}$/;
+                    if (!usernameRegex.test(value)) {
+                        isValid = false;
+                        errorMessage = 'Tên đăng nhập phải có 3-20 ký tự, chỉ chứa chữ cái, số và dấu gạch dưới';
+                    }
+                }
+                break;
+                
+            case 'email':
+                if (value) {
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    if (!emailRegex.test(value)) {
+                        isValid = false;
+                        errorMessage = 'Email không đúng định dạng';
+                    }
+                }
+                break;
+                
+            case 'phone':
+                if (value) {
+                    const phoneRegex = /^(0[3|5|7|8|9])+([0-9]{8})$/;
+                    if (!phoneRegex.test(value)) {
+                        isValid = false;
+                        errorMessage = 'Số điện thoại không đúng định dạng';
+                    }
+                }
+                break;
+                
+            case 'password':
+                if (value) {
+                    if (value.length < 8) {
+                        isValid = false;
+                        errorMessage = 'Mật khẩu phải có ít nhất 8 ký tự';
+                    } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(value)) {
+                        isValid = false;
+                        errorMessage = 'Mật khẩu phải chứa ít nhất 1 chữ hoa, 1 chữ thường và 1 số';
+                    }
+                }
+                // Also validate confirm password if it has value
+                const confirmPassword = document.getElementById('confirm-password');
+                if (confirmPassword.value) {
+                    this.validateField(confirmPassword);
+                }
+                break;
+                
+            case 'confirm-password':
+                const password = document.getElementById('password').value;
+                if (value && value !== password) {
+                    isValid = false;
+                    errorMessage = 'Mật khẩu xác nhận không khớp';
+                }
+                break;
+                
+            case 'terms':
+                if (!field.checked) {
+                    isValid = false;
+                    errorMessage = 'Bạn phải đồng ý với điều khoản sử dụng';
+                }
+                break;
+        }
+        
+        this.setFieldValidation(field, isValid, errorMessage);
+        return isValid;
+    }
+    
+    setFieldValidation(field, isValid, errorMessage) {
+        const feedback = field.parentNode.querySelector('.invalid-feedback') || 
+                        field.closest('.form-check')?.querySelector('.invalid-feedback');
+        
+        if (isValid) {
+            field.classList.remove('is-invalid');
+            field.classList.add('is-valid');
+            if (feedback) feedback.textContent = '';
+        } else {
+            field.classList.remove('is-valid');
+            field.classList.add('is-invalid');
+            if (feedback) feedback.textContent = errorMessage;
+        }
+    }
+    
+    clearFieldError(field) {
+        field.classList.remove('is-invalid');
+        const feedback = field.parentNode.querySelector('.invalid-feedback') || 
+                        field.closest('.form-check')?.querySelector('.invalid-feedback');
+        if (feedback) feedback.textContent = '';
+    }
+    
+    setupPasswordStrength() {
+        const passwordInput = document.getElementById('password');
+        const strengthBar = document.getElementById('password-strength-bar');
+        
+        passwordInput.addEventListener('input', () => {
+            const password = passwordInput.value;
+            const strength = this.calculatePasswordStrength(password);
+            
+            strengthBar.className = 'password-strength-bar';
+            if (strength > 0) {
+                strengthBar.classList.add(`strength-${this.getStrengthLevel(strength)}`);
+            }
+        });
+    }
+    
+    calculatePasswordStrength(password) {
+        let strength = 0;
+        
+        if (password.length >= 8) strength += 1;
+        if (/[a-z]/.test(password)) strength += 1;
+        if (/[A-Z]/.test(password)) strength += 1;
+        if (/\d/.test(password)) strength += 1;
+        if (/[^a-zA-Z0-9]/.test(password)) strength += 1;
+        
+        return strength;
+    }
+    
+    getStrengthLevel(strength) {
+        if (strength <= 2) return 'weak';
+        if (strength === 3) return 'fair';
+        if (strength === 4) return 'good';
+        return 'strong';
+    }
+    
+    setupFormSubmit() {
+        this.form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            // Validate all fields
+            const inputs = this.form.querySelectorAll('input[required], select[required]');
+            let isFormValid = true;
+            
+            inputs.forEach(input => {
+                if (!this.validateField(input)) {
+                    isFormValid = false;
+                }
+            });
+            
+            if (isFormValid) {
+                this.hideMessage();
+                this.showSuccess('Đăng ký thành công! Đang chuyển hướng...');
+                
+                // Simulate form submission
+                setTimeout(() => {
+                    // In real implementation, remove this and let the form submit normally
+                    // this.form.submit();
+                    console.log('Form would be submitted with data:', new FormData(this.form));
+                }, 2000);
+            } else {
+                this.showError('Vui lòng kiểm tra lại thông tin và điền đầy đủ các trường bắt buộc');
+                
+                // Scroll to first invalid field
+                const firstInvalid = this.form.querySelector('.is-invalid');
+                if (firstInvalid) {
+                    firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    firstInvalid.focus();
+                }
+            }
+        });
+    }
+    
+    showError(message) {
+        this.errorText.textContent = message;
+        this.errorMessage.style.display = 'block';
+        this.successMessage.style.display = 'none';
+    }
+    
+    showSuccess(message) {
+        this.successText.textContent = message;
+        this.successMessage.style.display = 'block';
+        this.errorMessage.style.display = 'none';
+    }
+    
+    hideMessage() {
+        this.errorMessage.style.display = 'none';
+        this.successMessage.style.display = 'none';
+    }
+}
+
+// Initialize the form when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    new RegisterForm();
+});
 </script>
+</body>
+</html>
