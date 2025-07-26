@@ -59,9 +59,9 @@ class UserController{
         User.findOne({ username: user.username })
             .then((exisinguser) => {
                 if(exisinguser){
-                   return res.status(400).render('login&register/register', {
-                    error: 'Tài khoàn đã được sử dụng. Vui lòng nhập lại!',
-                   })
+                    return res.status(400).json({
+                        message: 'Tài khoản đã tồn tại. Vui lòng nhập lại!',
+                    });
                 }
                 // Nếu tài khoản chưa tồn tại, mã hoá mật khẩu
                 return bcrypt.hash(user.password, saltRounds)
@@ -72,10 +72,17 @@ class UserController{
                         return user.save()
                     })
                     .then(() => {
-                        res.render('login&register/login')
+                        res.status(200).json({
+                            message: 'Đăng ký thành công!',
+                        });
                     })
             })
-            .catch(next);
+            .catch((err) => {
+                console.error(err);
+                res.status(500).json({
+                    message: 'Lỗi từ phía sever!',
+                });
+            });
     }
 
     // [GET] /logout

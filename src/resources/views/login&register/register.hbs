@@ -523,42 +523,56 @@ class RegisterForm {
     }
     
     setupFormSubmit() {
-        this.form.addEventListener('submit', (e) => {
+        this.form.addEventListener('submit', async (e) => {
             e.preventDefault();
-            
-            // Validate all fields
+
             const inputs = this.form.querySelectorAll('input[required], select[required]');
             let isFormValid = true;
-            
+
             inputs.forEach(input => {
                 if (!this.validateField(input)) {
                     isFormValid = false;
                 }
             });
-            
-            if (isFormValid) {
-                this.hideMessage();
-                this.showSuccess('Đăng ký thành công! Đang chuyển hướng...');
-                
-                // Simulate form submission
-                setTimeout(() => {
-                    // In real implementation, remove this and let the form submit normally
-                    // this.form.submit();
-                    console.log('Form would be submitted with data:', new FormData(this.form));
-                }, 2000);
-            } else {
+
+            if (!isFormValid) {
                 this.showError('Vui lòng kiểm tra lại thông tin và điền đầy đủ các trường bắt buộc');
-                
-                // Scroll to first invalid field
                 const firstInvalid = this.form.querySelector('.is-invalid');
                 if (firstInvalid) {
                     firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
                     firstInvalid.focus();
                 }
+                return;
+            }
+
+            // Tạo object dữ liệu từ form
+            const formData = new FormData(this.form);
+            const data = Object.fromEntries(formData.entries());
+
+            try {
+                const res = await fetch('/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await res.json();
+
+                if (res.ok) {
+                    this.showSuccess(result.message || 'Đăng ký thành công! Đang chuyển hướng...');
+                    setTimeout(() => {
+                        window.location.href = '/login';
+                    }, 2000);
+                } else {
+                    this.showError(result.message || 'Đăng ký thất bại!');
+                }
+            } catch (err) {
+                this.showError('Lỗi kết nối đến máy chủ, vui lòng thử lại sau.');
+                console.error(err);
             }
         });
     }
-    
+
     showError(message) {
         this.errorText.textContent = message;
         this.errorMessage.style.display = 'block';
