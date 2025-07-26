@@ -5,7 +5,7 @@ const mongoose = require('mongoose');
 
 async function connect() {
     try {
-        await mongoose.connect('mongodb+srv://vietanh:Vietanh123@todolist.e404wls.mongodb.net/?retryWrites=true&w=majority&appName=todolist');
+        await mongoose.connect(process.env.MONGODB_URI);
         console.log('Kết nối đến database thành công!!!');
     } catch (error) {
         console.log('Kết nối thất bại. Vui lòng thử lại!!!');
